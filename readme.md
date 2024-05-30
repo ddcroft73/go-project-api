@@ -12,17 +12,17 @@ It's pretty simple but Learning the way Gin Handles the routes seems a bit more 
 
 ## Routes:
 
-/login-acces-token
-/test-token
-/register
-/verify-email
-/resend-email-verification
-/reset-password
-/recover-password
-/verify-2fa
-/resend-2fa
+- /login-acces-token
+- /test-token
+- /register
+- /verify-email
+- /resend-email-verification
+- /reset-password
+- /recover-password
+- /verify-2fa
+- /resend-2fa
 
 ## Other Services:
- 
+
 User assets
 Still working it out. So far I just have a goal for the app in mind, and Im currently building the service to handling all the authorizations.

@@ -1,6 +1,6 @@
 ## Auth micro service in GO
 
-This is the Auth API for a Backend written in Go. This project is going to be a Personal inventory organizer. It will consist of micro services all written in Go.
+This is the Auth API for a Backend written in Go. This project is going to be a Personal inventory organizer. It will consist of micro services all written in Go. So far the code is mostlu boilerplate. You can add a user and hash their password. That's about it. Still have to build out all the routes.
 
 ## Tech Stack:
 
@@ -25,3 +25,4 @@ It's pretty simple but Learning the way Gin Handles the routes seems a bit more 
 ## Other Services:
  
 User assets
+Still working it out. So far I just have a goal for the app in mind, and Im currently building the service to handling all the authorizations.

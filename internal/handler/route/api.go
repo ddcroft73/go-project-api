@@ -1,28 +1,35 @@
 package route
 
 import (
-    "github.com/gin-gonic/gin"
-    "go-project-api/internal/handler"
-    "go-project-api/internal/service"
-    "go-project-api/internal/repository"
+	"github.com/gin-gonic/gin"
+	"go-project-api/internal/handler"
+	"go-project-api/internal/repository"
+	"go-project-api/internal/service"
 	"log"
 )
 
 func SetupRouter(r *gin.Engine) {
 
-    userRepo, err := repository.ConnectDatabase()
-    if err != nil {
+	userRepo, err := repository.ConnectDatabase()
+	if err != nil {
 		log.Fatal(err)
-    }    
+	}
 
-    // Create an instance of AuthService
-    authService := service.NewAuthService(userRepo)
+	authService := service.NewAuthService(userRepo)
+	authHandler := handler.NewAuthHandler(authService)
 
-    // Create an instance of AuthHandler
-    authHandler := handler.NewAuthHandler(authService)
-
-    // Register the routes
-    r.POST("/login", authHandler.Login)
-    r.POST("/register", authHandler.Register)
-
+	r.POST("/login-access-token", authHandler.Login)
+	r.POST("/register", authHandler.Register) // same as CreateUser
+	r.GET("/test-token", authHandler.TestToken)
+	r.POST("/verify-email", authHandler.VerifyEmail)
+	r.POST("/resend-email-verification", authHandler.ResendEmailVerification)
+	r.POST("/reset-password", authHandler.ResetPassword)
+	r.POST("/recover-password", authHandler.RecoverPassword)
+	r.POST("/verify-2fa", authHandler.Verify2FA)
+	r.POST("/resend-2fa", authHandler.Resend2FA)
+	// User Operations
+	r.GET("/get-user/:id", authHandler.GetUser_Handle)
+	r.GET("/update-user/:id", authHandler.UpdateUser_Handle)
+	r.GET("/delete-user/:id", authHandler.DeleteUser_Handle)
+	r.GET("/get-all-users", authHandler.GetAllUsers_Handle)
 }

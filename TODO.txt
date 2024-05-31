@@ -1,0 +1,19 @@
+
+
+Routes:
+
+- /login-get-access-token      DONE
+- /register (CreateUser)
+- /test-token
+- /verify-email
+- /resend-email-verification
+- /reset-password
+- /recover-password
+- /verify-2fa
+- /resend-2fa
+
+User Ops
+- /get-user/{id}
+- /update-user/{id}
+- /delete-user/{id}
+- /get-all-users

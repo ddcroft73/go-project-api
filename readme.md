@@ -15,13 +15,17 @@ This service will be responsible for handling the following parts of the backend
 
 - /login-acces-token
 - /test-token
-- /register
+- /register.. (CreateUSer))
 - /verify-email
 - /resend-email-verification
 - /reset-password
 - /recover-password
 - /verify-2fa
 - /resend-2fa
+- /get-user/{id}
+- /update-user/{id}
+- /delete-user/{id}
+- /get-all-users
 
 ...and any others I may have forgotten.
 
@@ -31,8 +35,9 @@ One of the hardest things about programming personally is coming up with an idea
 
 Micro Services:
 
-There will be 3 services in all.
+There will be 4 services in all.
 
-- Auth Service: wil handle all onboarding and access to the application. As well as password recovery, email/phone verification. 2FA etc
+- Auth Service: wil handle all onboarding and access to the application. As well as password recovery, email/phone verification. 2FA etc. as well
+  as User maintence. Since the API is mostly built around the User model it makes sense to just incorporate a few user CRUD endpoints foruser maintence
 - Asset Service: Will handle the management of user assets. It will have its own database to store info about assets as well as images. It will expose API endpoints for creating, updating, deleting of assets. Assets will be searchable, filtration and pagination.
 - Notification Service: will be responsible for any emails, or SMS messages that need to be sent to user sfor verification purposes. This service has already been built for use in another backend I have written in python. This is a perfect example of microservices in different languages.

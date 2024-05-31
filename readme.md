@@ -7,7 +7,7 @@ This is a service that will be one part of a 3 part system going together to bui
 - Go: The programming language the service is built with.
 - mySQL: Relational  Database Management chosen for the project. Tried and true.
 - GORM: A powerful ORM. It simplifies many database operations and adds a layet of abstraction that should make my life a lot easier..  but it does come with a learning curve. It's the first part of the service I am implementing. I plan to use it across all the services.
-- Gin: the web framework I chose to base the API on. Previously I didn't use a framework. [https://github.com/ddcroft73/go-crud-app](Here) I found it a lot easier to build an API without employing an API. This isn't something I'd ever do in a language like Python, or Node. In fact I almost didn't even use one, but I feel I should learn Gin because it is really popular and the way it handles routing and JSON is a bit more inviting than without. Also the middleware looks a lot easier to work with..
+- Gin: the web framework I chose to base the API on. Previously I didn't use a framework. [Here](https://github.com/ddcroft73/go-crud-app) I found it a lot easier to build an API without employing an API. This isn't something I'd ever do in a language like Python, or Node. In fact I almost didn't even use one, but I feel I should learn Gin because it is really popular and the way it handles routing and JSON is a bit more inviting than without. Also the middleware looks a lot easier to work with..
 
 ## Routes:
 

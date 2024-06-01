@@ -7,9 +7,10 @@ import (
 	"go-project-api/internal/repository"
 	"go-project-api/internal/security"
 	_ "go-project-api/internal/util"
+	"log"
 )
 
-//thisd file is where the work is actually done for the authenticATION. effectivly this is the next stop after a request is sent.
+//this file is where the work is actually done for the authenticATION. effectivly this is the next stop after a request is sent.
 
 type AuthService struct {
 	userRepo *repository.UserRepository
@@ -23,7 +24,7 @@ func NewAuthService(userRepo *repository.UserRepository) *AuthService {
 
 func (s *AuthService) Login(username, password string) (string, error) {
 
-	user, err := s.userRepo.FindByUsername(username)
+	user, err := repository.FindByUsername(s.userRepo, username)
 	if err != nil {
 		return "", err
 	}
@@ -40,12 +41,10 @@ func (s *AuthService) Login(username, password string) (string, error) {
 	return token, nil
 }
 
-func (s *AuthService) Register(username, password, email string) error {
-	// Implement the registration logic here
-	// This might involve validating the input data, checking for duplicate usernames/emails,
-	// creating a new user record in the database, etc.
-	// Example:
-	exists, err := s.userRepo.UsernameExists(username)
+func (s *AuthService) Register(username, password, email, phone  string) error {
+	// ...
+
+	exists, err := repository.UsernameExists(s.userRepo, username)
 	if err != nil {
 		return err
 	}
@@ -56,6 +55,49 @@ func (s *AuthService) Register(username, password, email string) error {
 		Username: username,
 		Password: password,
 		Email:    email,
+		Phone:    phone,
 	}
-	return s.userRepo.CreateUser(user)
+
+	err = repository.CreateUser(s.userRepo, user)
+    if err != nil {
+        log.Printf("Failed to create user: %v", err)
+        return err
+    }
+
+    return nil
+}
+
+func (s *AuthService) UpdateUserByID(userID int, updatedUser *model.User) ( *model.User, error ){
+	   
+    existingUser, err := repository.GetUserByID(s.userRepo, userID)
+    if err != nil {
+        return nil, err
+    }
+   
+    if updatedUser.Username != "" {
+        existingUser.Username = updatedUser.Username
+    }
+    if updatedUser.Password != "" {
+        // need to hash the new password before saving.
+		hashedPassword, err := security.HashPassword(updatedUser.Password)
+		if err != nil {
+			return nil, err
+		}
+        existingUser.Password = hashedPassword
+    }
+    if updatedUser.Email != "" {
+        existingUser.Email = updatedUser.Email
+    }
+    if updatedUser.Phone != "" {
+        existingUser.Phone = updatedUser.Phone
+    }
+
+    // Save the updated user to the database
+    err = repository.UpdateUser(s.userRepo, existingUser)
+    if err != nil {
+        return nil, err
+    }
+
+    return existingUser, nil
+
 }

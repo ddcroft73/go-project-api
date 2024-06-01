@@ -22,7 +22,7 @@ func main() {
         IsSuperUser: true,
     }
 
-    err = userRepo.CreateUser(initialUser)
+    err = repository.CreateUser(userRepo, initialUser)
     if err != nil {
         log.Fatal("Failed to create the initial user:", err)
     }

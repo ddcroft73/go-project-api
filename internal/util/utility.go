@@ -4,7 +4,8 @@ import (
 	"log"
 	"os"
 )
-
+// THis logger writes to a file called api.log. It allows me to catch errors snd debug where 
+// things cant be sent to the terminal.
 func logger() *os.File {
 	logFile, err := os.OpenFile("api.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
@@ -21,5 +22,10 @@ func WriteLog(message interface{}, arg ...interface{}) {
 	defer logFile.Close() // Close the log file when the application exits
 
 	logger := log.New(logFile, "", log.LstdFlags)
-	logger.Println(message, arg)
+	if len(arg) != 0 {
+        logger.Println(message, arg)
+	} else {
+        logger.Println(message)
+	}
+	
 }

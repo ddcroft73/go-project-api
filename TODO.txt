@@ -2,7 +2,8 @@
 
 Routes:
 
-- /login-get-access-token      DONE
+- /login-get-access-token      DONE.. Access-token. I will implement the use of refresh tokens
+                                      later and probably on the next iteration.
 - /register (CreateUser)
 - /test-token
 - /verify-email

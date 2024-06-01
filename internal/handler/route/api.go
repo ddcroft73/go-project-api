@@ -6,6 +6,8 @@ import (
 	"go-project-api/internal/repository"
 	"go-project-api/internal/service"
 	"log"
+	"go-project-api/internal/middleware"
+
 )
 
 func SetupRouter(r *gin.Engine) {
@@ -29,7 +31,9 @@ func SetupRouter(r *gin.Engine) {
 	r.POST("/resend-2fa", authHandler.Resend2FA)
 	// User Operations
 	r.GET("/get-user/:id", authHandler.GetUser_Handle)
-	r.GET("/update-user/:id", authHandler.UpdateUser_Handle)
-	r.GET("/delete-user/:id", authHandler.DeleteUser_Handle)
+	
+	r.PUT("/update-user/:id", middleware.AuthMiddleware, authHandler.UpdateUser_Handle)
+
+	r.DELETE("/delete-user/:id", authHandler.DeleteUser_Handle)
 	r.GET("/get-all-users", authHandler.GetAllUsers_Handle)
 }

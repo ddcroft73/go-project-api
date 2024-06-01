@@ -20,7 +20,10 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	}
 }
 
-func GetUserByID(r *UserRepository, id uint) (*model.User, error) {
+
+
+// THese are the actual Database functions that use gorm to do the database operations. 
+func GetUserByID(r *UserRepository, id int) (*model.User, error) {
 	var user model.User
 	result := r.DB.First(&user, id)
 	if result.Error != nil {
@@ -45,7 +48,7 @@ func DeleteUser(r *UserRepository, id uint) error {
 	}
 	return nil
 }
-func (r *UserRepository) CreateUser(user *model.User) error {
+func CreateUser(r *UserRepository, user *model.User) error {
 
 	// Hash the password before saving the user
 	hashedPassword, err := security.HashPassword(user.Password)
@@ -61,7 +64,7 @@ func (r *UserRepository) CreateUser(user *model.User) error {
 	return nil
 }
 
-func (r *UserRepository) FindByUsername(username string) (*model.User, error) {
+func FindByUsername(r *UserRepository, username string) (*model.User, error) {
 	// Implement the logic to find a user by username in the database
 	// Example using a hypothetical ORM:
 	var user model.User
@@ -75,9 +78,9 @@ func (r *UserRepository) FindByUsername(username string) (*model.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) UsernameExists(username string) (bool, error) {
+func UsernameExists(r *UserRepository, username string) (bool, error) {
 	// Implement the logic to check if a username already exists in the database
-	// Example using a hypothetical ORM:
+	
 	var count int64
 	result := r.DB.Model(&model.User{}).Where("username = ?", username).Count(&count)
 	if result.Error != nil {

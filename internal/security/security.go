@@ -1,15 +1,18 @@
 package security
 
 import (
+	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/joho/godotenv"
 	"go-project-api/internal/model"
+	"go-project-api/internal/util"
 	_ "go-project-api/internal/util"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func LoadEnvVars() error {
@@ -34,22 +37,33 @@ func CheckPasswordHash(password, hash string) bool {
 
 func GenerateJWTToken(user *model.User, expTime ...int64) (string, error) {
 
+	// Set default expiration time if not provided
+	var exp int64
 	if len(expTime) == 0 {
-		expTime = []int64{time.Now().Add(time.Hour * 24).Unix()}
+		exp = time.Now().Add(time.Hour * 24).Unix() // 24 hours from now
+	} else {
+		exp = expTime[0] // Use the first element provided
 	}
+
 	// Define the token claims
 	claims := jwt.MapClaims{
 		"userID": user.ID,
-		"exp":    expTime, // Token expiration time (e.g., 24 hours from now)
+		"exp":    exp, // Token expiration time
 	}
 
-	// Create a new token with the claims
+	util.WriteLog("in GenerateJWTToken: user.ID in token = ", claims["userID"])
+
+	// Create a new token with the specified claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Sign the token with a secret key
-	api_key := os.Getenv("API_KEY")
-	secretKey := []byte(api_key)
+	// Get the secret key from environment variables
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		return "", errors.New("API_KEY environment variable not set")
+	}
+	secretKey := []byte(apiKey)
 
+	// Sign the token with the secret key
 	signedToken, err := token.SignedString(secretKey)
 	if err != nil {
 		return "", err

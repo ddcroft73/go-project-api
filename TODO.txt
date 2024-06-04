@@ -18,3 +18,8 @@ User Ops
 - /update-user/{id}
 - /delete-user/{id}
 - /get-all-users
+
+
+
+The Auth middleware is all fucked up. It seems to be close but not quite. I have no problem querying the database
+updateing, and saving records. But I need to work on getting athe auth middleware to work. 

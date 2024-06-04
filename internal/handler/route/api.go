@@ -3,11 +3,10 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 	"go-project-api/internal/handler"
+	_ "go-project-api/internal/middleware"
 	"go-project-api/internal/repository"
 	"go-project-api/internal/service"
 	"log"
-	"go-project-api/internal/middleware"
-
 )
 
 func SetupRouter(r *gin.Engine) {
@@ -20,6 +19,9 @@ func SetupRouter(r *gin.Engine) {
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
+	//userService := service.NewUserService(userRepo)
+	//authMiddleware := middleware.NewMiddleware(userService)
+
 	r.POST("/login-access-token", authHandler.Login)
 	r.POST("/register", authHandler.Register) // same as CreateUser
 	r.GET("/test-token", authHandler.TestToken)
@@ -31,9 +33,10 @@ func SetupRouter(r *gin.Engine) {
 	r.POST("/resend-2fa", authHandler.Resend2FA)
 	// User Operations
 	r.GET("/get-user/:id", authHandler.GetUser_Handle)
-	
-	r.PUT("/update-user/:id", middleware.AuthMiddleware, authHandler.UpdateUser_Handle)
+
+	r.PUT("/update-user/:id", authHandler.UpdateUser_Handle) //  authMiddleware.AuthMiddlewareFunc,
 
 	r.DELETE("/delete-user/:id", authHandler.DeleteUser_Handle)
 	r.GET("/get-all-users", authHandler.GetAllUsers_Handle)
+
 }

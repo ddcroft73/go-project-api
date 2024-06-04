@@ -12,6 +12,7 @@ func main() {
     if err != nil {
         log.Fatal("Failed to connect to the database:", err)
     }
+    defer userRepo.Close() // Ensure closure even if panic occurs
 
     // Create the initial user
     initialUser := &model.User{

@@ -4,23 +4,24 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-project-api/internal/service"
+	"go-project-api/internal/middleware"
 	"go-project-api/internal/model"
+	"go-project-api/internal/service"
 	_ "go-project-api/internal/util"
 	"net/http"
-    "strconv"
-	"go-project-api/internal/middleware"
+	"strconv"
 )
 
 type UpdateUserRequest struct {
-    Username string `json:"username" binding:"omitempty"`
-    Password string `json:"password" binding:"omitempty"`
-    Email    string `json:"email" binding:"omitempty"`
-    Phone    string `json:"phone" binding:"omitempty"`
+	Username string `json:"username" binding:"omitempty"`
+	Password string `json:"password" binding:"omitempty"`
+	Email    string `json:"email" binding:"omitempty"`
+	Phone    string `json:"phone" binding:"omitempty"`
 }
 
 type AuthHandler struct {
-	authService *service.AuthService
+	authService    *service.AuthService
+	authMiddleware *middleware.AuthMiddleware
 }
 
 func NewAuthHandler(authService *service.AuthService) *AuthHandler {
@@ -49,7 +50,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	email := c.PostForm("email")
-    phone := c.PostForm("phone")
+	phone := c.PostForm("phone")
 
 	// Invoke the Register method from the AuthService
 	err := h.authService.Register(username, password, email, phone)
@@ -61,56 +62,72 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Registration successful"})
 }
 
-
 // USer Operations.
 func (h *AuthHandler) GetUser_Handle(c *gin.Context) {
+	//
+	// Get the user ID from the URL parameter
+	paramUserID := c.Param("id")
 
+	// Convert the parameter user ID to an integer
+	paramUserIDInt, err := strconv.Atoi(paramUserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	user, err := h.authService.GetUser(paramUserIDInt)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": user})
 }
 
 func (h *AuthHandler) UpdateUser_Handle(c *gin.Context) {
-    // get the id of the current user
-     authenticatedUserID := c.GetInt("userID")
+	// get the id of the current user
+	authenticatedUserID := c.GetInt("userID")
 
-     // Get the user ID from the URL parameter
-     paramUserID := c.Param("id")
- 
-     // Convert the parameter user ID to an integer
-     paramUserIDInt, err := strconv.Atoi(paramUserID)
-     if err != nil {
-         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-         return
-     }
- 
-     // Check if the authenticated user is the owner of the data or a superuser
-     if authenticatedUserID != paramUserIDInt && !middleware.IsSuperUser(authenticatedUserID) {
-         c.JSON(http.StatusForbidden, gin.H{"error": "Unauthorized"})
-         return
-     }
+	// Get the user ID from the URL parameter
+	paramUserID := c.Param("id")
 
-    // Bind the request payload to the UpdateUserRequest struct
-    var updateReq UpdateUserRequest
-    if err := c.ShouldBindJSON(&updateReq); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-
-    user := &model.User{
-        Username: updateReq.Username, 
-        Password: updateReq.Password, 
-        Email: updateReq.Email, 
-        Phone: updateReq.Phone, 
-    }
-
-    updatedUser,err := h.authService.UpdateUserByID(paramUserIDInt, user)
-    if err != nil {
-        c.JSON(http.StatusNotModified, gin.H{"error": err.Error()})
+	// Convert the parameter user ID to an integer
+	paramUserIDInt, err := strconv.Atoi(paramUserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
-    }
-    
-    // return the updated user info, when all is kosherDill
-    c.JSON(http.StatusOK, gin.H{"message": updatedUser}) 
-}
+	}
+	//
 
+	// Check if the authenticated user is the owner of the data or a superuser
+	if authenticatedUserID != paramUserIDInt && !h.authMiddleware.IsSuperUser(authenticatedUserID) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Bind the request payload to the UpdateUserRequest struct
+	var updateReq UpdateUserRequest
+	if err := c.ShouldBindJSON(&updateReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user := &model.User{
+		Username: updateReq.Username,
+		Password: updateReq.Password,
+		Email:    updateReq.Email,
+		Phone:    updateReq.Phone,
+	}
+
+	updatedUser, err := h.authService.UpdateUserByID(paramUserIDInt, user)
+	if err != nil {
+		c.JSON(http.StatusNotModified, gin.H{"error": err.Error()})
+		return
+	}
+
+	// return the updated user info, when all is kosherDill
+	c.JSON(http.StatusOK, gin.H{"message": updatedUser})
+}
 
 func (h *AuthHandler) DeleteUser_Handle(c *gin.Context) {
 
@@ -119,8 +136,6 @@ func (h *AuthHandler) DeleteUser_Handle(c *gin.Context) {
 func (h *AuthHandler) GetAllUsers_Handle(c *gin.Context) {
 
 }
-
-
 
 func (h *AuthHandler) TestToken(c *gin.Context) {
 
